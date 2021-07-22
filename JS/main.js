@@ -4,9 +4,9 @@ function main() {
     // Todo Setup der RTCG-App
     const container = document.querySelector('#scene-container');
     // 1. Instanz der RTCG-App
-    const dudarain_RTCG = new RTCG(container);
+    const rtcg = new RTCG(container);
     // 2. Szenen-Rendering
-    dudarain_RTCG.start()
-    }
+    rtcg.start()
+}
 // main() Aufruf, um die RTCG-App zu starten
 main();
