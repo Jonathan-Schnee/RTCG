@@ -40,7 +40,6 @@ class selection{
 
 
     onSelect( event ) {
-        console.log(gltfscene);
         // calculate mouse position in normalized device coordinates
         // (-1 to +1) for both components
         endmouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -61,14 +60,14 @@ class selection{
         if(event.clientX - startmouse.x < mousediff && event.clientY - startmouse.y < mousediff){
             const intersects = raycaster.intersectObjects(group); 
             if(intersects.length > 0){
-                let anim_ob = new Anim_obj(intersects[0].object, group, anim_loop, gltfscene)
+                let anim_ob = new Anim_obj(intersects[0].object, group, anim_loop, gltfscene, camera)
             }    
         }
         else if(!(typeof event.changedTouches === 'undefined')){
             if(event.changedTouches[0].clientX - starttouch.x < touchdiff && event.changedTouches[0].clientY - starttouch.y < touchdiff){
                 const intersects = raycaster.intersectObjects(group); 
                 if(intersects.length > 0){    
-                    let anim_ob = new Anim_obj(intersects[0].object, group, anim_loop, gltfscene)
+                    let anim_ob = new Anim_obj(intersects[0].object, group, anim_loop, gltfscene, camera)
                 } 
             }
         }

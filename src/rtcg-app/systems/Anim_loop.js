@@ -53,7 +53,12 @@ class Anim_loop {
 
 
             if(!(typeof this.gltf === "undefined")){
-                composer.render()
+                if(!renderer.xr.isPresenting){
+                    composer.render();
+                }
+                else{
+                    renderer.render(scene,camera);
+                }
             }
         });
     }
