@@ -18,17 +18,25 @@ let mousediff = 1;
 let touchdiff = 5;
 let pos;
 let sca;
+let spos= [[]];
+let ssca= [[]];
 let camera;
+
 
 class Anim_obj{
 
     constructor(cobj, cgroup, canim_loop, cgltfscene, ccamera){
+
         obj = cobj;
         group = cgroup;
         gltfscene = cgltfscene;
         anim_loop = canim_loop;
         camera = ccamera;
         this.animate()
+        window.addEventListener( 'touchstart', this.onPoint);
+        window.addEventListener( 'touchend', this.endPoint);
+        window.addEventListener( 'mousedown', this.onPoint);
+        window.addEventListener( 'mouseup', this.endPoint);
     }
 
     animate(){
@@ -60,19 +68,48 @@ class Anim_obj{
                     }
                 }
             }
+            if(obj.scale.x != 10){
+                pos = new Vector3(obj.position.x, obj.position.y, obj.position.z);
+                sca = new Vector3(obj.scale.x, obj.scale.y, obj.scale.z)
+                obj.scale.set(10,10,10);
+                obj.position.set(0,0,0);
+            }   
+        }
+
+
+        if(obj.name.includes("Safe")){
+            for(var i = 1; i < gltfscene.length; i++){
+                
+                if(gltfscene[i].type == "Mesh"){
+                    if(!gltfscene[i].name.includes(obj.name)){
+                        gltfscene[i].visible = false
+                    }
+                }
+            }
+            for(var i = 1; i < group.length; i++){
+
+                if(group[i].type == "Mesh" && !group[i].name.includes("Safe")){
+                    if(!group[i].name.includes(obj.name)){
+                        group[i].visible = false
+                    }
+                }
+            }
             
-            pos = new Vector3(obj.position.x, obj.position.y, obj.position.z);
+            
+            for(var i = 1; i < group.length; i++){
+                
+                if(group[i].name.includes("Safe") && group[i].scale.x != 3){
+                    spos[i] = new Vector3(group[i].position.x, group[i].position.y, group[i].position.z);
+                    ssca[i] = new Vector3(group[i].scale.x, group[i].scale.y, group[i].scale.z)
+                    group[i].scale.set(3,3,3);
+                    group[i].position.set(0,0,0);
+                    
+                }
+            }
 
-            sca = new Vector3(obj.scale.x, obj.scale.y, obj.scale.z)
-            obj.scale.set(10,10,10);
-            obj.position.set(0,0,0);
-
-            window.addEventListener( 'touchstart', this.onPoint);
-            window.addEventListener( 'touchend', this.onSelect);
-            window.addEventListener( 'mousedown', this.onPoint);
-            window.addEventListener( 'mouseup', this.onSelect);
         }
     }
+    
     onPoint(event){
         startmouse.x = event.clientX;
         startmouse.y =event.clientY;
@@ -82,7 +119,7 @@ class Anim_obj{
         }
         
     }
-    onSelect( event ) {
+    endPoint( event ) {
         // calculate mouse position in normalized device coordinates
         // (-1 to +1) for both components
         endmouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -102,28 +139,9 @@ class Anim_obj{
         }
         if(event.clientX - startmouse.x < mousediff && event.clientY - startmouse.y < mousediff){
             const intersects = raycaster.intersectObjects(group); 
-            
-            if(intersects.length == 0){  
-                       
-                obj.scale.set(sca.x, sca.y, sca.z);
-                obj.position.set(pos.x, pos.y, pos.z);
-                camera.position.set(0, 0, 50);
-                for(var i = 1; i < gltfscene.length; i++){
-                    if(gltfscene[i].type == "Mesh"){
-                            gltfscene[i].visible = true;
-                    }
-                }
-                for(var i = 1; i < group.length; i++){
-                    if(group[i].type == "Mesh"){
-                        group[i].visible = true;
-                    }
-                }
-            }    
-        }
-        else if(!(typeof event.changedTouches === 'undefined')){
-            if(event.changedTouches[0].clientX - starttouch.x < touchdiff && event.changedTouches[0].clientY - starttouch.y < touchdiff){
-                const intersects = raycaster.intersectObjects(group); 
-                if(intersects.length == 0){
+            if(obj.name.includes("Letter")){
+                if(intersects.length == 0){  
+                        
                     obj.scale.set(sca.x, sca.y, sca.z);
                     obj.position.set(pos.x, pos.y, pos.z);
                     camera.position.set(0, 0, 50);
@@ -137,11 +155,55 @@ class Anim_obj{
                             group[i].visible = true;
                         }
                     }
-                }   
+                    obj = group[0];
+                }  
+            } 
+            if(obj.name.includes("Safe")){
+                if(intersects.length == 0){
+                    for(var i = 1; i < group.length; i++){
+                        if(group[i].name.includes("Safe")){
+                            group[i].scale.set(ssca[i].x,ssca[i].y,ssca[i].z);
+                            group[i].position.set(spos[i].x,spos[i].y,spos[i].z);    
+                        }
+                    }
+                    for(var i = 1; i < gltfscene.length; i++){
+                        if(gltfscene[i].type == "Mesh"){
+                                gltfscene[i].visible = true;
+                        }
+                    }
+                    for(var i = 1; i < group.length; i++){
+                        if(group[i].type == "Mesh"){
+                            group[i].visible = true;
+                        }
+                    }
+                    obj = group[0];
+                }
+            }    
+        }
+        else if(!(typeof event.changedTouches === 'undefined')){
+            if(event.changedTouches[0].clientX - starttouch.x < touchdiff && event.changedTouches[0].clientY - starttouch.y < touchdiff){
+                const intersects = raycaster.intersectObjects(group);
+                if(obj.name.includes("Letter")){ 
+                    if(intersects.length == 0){
+                        obj.scale.set(sca.x, sca.y, sca.z);
+                        obj.position.set(pos.x, pos.y, pos.z);
+                        camera.position.set(0, 0, 50);
+                        for(var i = 1; i < gltfscene.length; i++){
+                            if(gltfscene[i].type == "Mesh"){
+                                    gltfscene[i].visible = true;
+
+                            }
+                        }
+                        for(var i = 1; i < group.length; i++){
+                            if(group[i].type == "Mesh"){
+                                group[i].visible = true;
+
+                            }
+                        }
+                    }   
+                }
             }
         }
-        // calculate objects intersecting the picking ray
-
     }
 }
 export {Anim_obj}

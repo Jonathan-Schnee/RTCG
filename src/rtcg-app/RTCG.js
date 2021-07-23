@@ -19,6 +19,7 @@ let loader; // Wir müssen eine Variable für einen gltf-Modell-Loader erstellen
 let arbutton;
 let gltf;
 let gltfscene;
+let safe;
 const manager = new LoadingManager();
 
 
@@ -28,6 +29,7 @@ class RTCG {
     constructor(container) {
         gltf = [];
         gltfscene = [];
+        safe = [];
         camera = createCamera();
         scene = createScene();
         renderer = createRenderer(scene, camera);
@@ -77,6 +79,7 @@ class RTCG {
         // URL zum jeweiligen Objekt
         const modelUrl = "./model/sceneobj.glb";
         const modelUrl2 = "./model/interactive.glb";
+        const modelUrl3 = "./model/safe.glb";
 
         // Erstellung  GLTF-Ladeobjekt. GLTF ist ein 3D-Modellformat, das üblicherweise als das "JPEG von 3D" bezeichnet wird, weil es schnell und effizient zu verwenden ist, was ideal für das Web ist
             loader = new GLTFLoader(manager);
@@ -93,7 +96,6 @@ class RTCG {
                     console.log("Modell wurde der Szene hinzugefügt!");
                 model.scene.position.z = -0.25;
                 model.scene.traverse(function (child) {
-    
                     gltfscene.push(child)
                   });
             },
@@ -116,7 +118,7 @@ class RTCG {
             },
         ); 
         var self = this;
-        manager.onLoad = function() {self.anim_loop.loadObj(gltf); new selection(camera,gltf, self.anim_loop,gltfscene) }
+        manager.onLoad = function() {self.anim_loop.loadObj(gltf); new selection(camera,gltf, self.anim_loop,gltfscene)}
     }
 
 }
